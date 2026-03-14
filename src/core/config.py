@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     OPENAI_MODEL_ID: str = "gpt-4o"
     OLLAMA_MODEL_ID: str = "llama3.1"
     OLLAMA_BASE_URL: str | None = None
+    AGENT_MEMORY_DB_PATH: str = "tmp/architect_memory.db"
     
     # Spark Analysis Thresholds (Enterprise Configurable)
     SPARK_HISTORY_SERVER_URL: str = "http://localhost:18080"
