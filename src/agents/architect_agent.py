@@ -47,7 +47,7 @@ async def fetch_spark_sql_plans(app_id: str) -> List[Dict[str, Any]]:
 # --- AGENT CORE ---
 class AgenticArchitect:
     def __init__(self, model_name: str | None = None):
-        self.db = SqliteDb(db_file="tmp/architect_memory.db")
+        self.db = SqliteDb(db_file=settings.AGENT_MEMORY_DB_PATH)
         self.memory_manager = MemoryManager(db=self.db)
         
         # 1. Initialize Model based on Provider Configuration
