@@ -1,0 +1,23 @@
+# Enterprise Default Configuration
+# -------------------------------
+# These are non-sensitive defaults. 
+# Secrets and environment-specific overrides should be in .env or ENV VARS.
+
+PROJECT_NAME: "Spark Optimizer AI Agent"
+API_V1_STR: "/api/v1"
+
+# Spark Analysis Thresholds
+SPARK_HISTORY_SERVER_URL: "http://localhost:18080"
+SPARK_SKEW_THRESHOLD_MULTIPLIER: 3.0
+SPARK_MEMORY_OVERHEAD_WARNING_PERCENT: 0.85
+
+# Airflow Rules
+AIRFLOW_REQUIRE_TASKFLOW: true
+
+# Agent Memory
+AGENT_MEMORY_DB_PATH: "tmp/architect_memory.db"
+
+# LLM Defaults (can be overridden in .env)
+OPENAI_MODEL_ID: "gpt-4o"
+OLLAMA_MODEL_ID: "llama3.1"
+OLLAMA_BASE_URL: "http://localhost:11434"

@@ -1,26 +1,68 @@
-from pydantic_settings import BaseSettings
+from typing import Any, Tuple, Type
+import yaml
+from pathlib import Path
+from pydantic_settings import (
+    BaseSettings, 
+    PydanticBaseSettingsSource, 
+    SettingsConfigDict
+)
+
+class YamlConfigSettingsSource(PydanticBaseSettingsSource):
+    """
+    A simple settings source class that loads variables from a YAML file.
+    """
+    def __init__(self, settings_cls: Type[BaseSettings]):
+        super().__init__(settings_cls)
+        self.config_path = Path("config/settings.yaml")
+
+    def get_dict_content(self) -> dict[str, Any]:
+        if not self.config_path.exists():
+            return {}
+        with open(self.config_path, "r") as f:
+            return yaml.safe_load(f) or {}
+
+    def __call__(self) -> dict[str, Any]:
+        return self.get_dict_content()
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Data Architect AI Agent"
-    API_V1_STR: str = "/api/v1"
+    # Project Info
+    PROJECT_NAME: str
+    API_V1_STR: str
     
-    # AI / LLM Configuration
-    MODEL_PROVIDER: str = "openai"  # "openai" or "ollama"
+    # AI / LLM Configuration (Values from ENV/YAML)
+    MODEL_PROVIDER: str = "openai"  # Default if not in YAML/ENV
     OPENAI_API_KEY: str | None = None
-    OPENAI_MODEL_ID: str = "gpt-4o"
-    OLLAMA_MODEL_ID: str = "llama3.1"
-    OLLAMA_BASE_URL: str | None = None
-    AGENT_MEMORY_DB_PATH: str = "tmp/architect_memory.db"
+    OPENAI_MODEL_ID: str
+    OLLAMA_MODEL_ID: str
+    OLLAMA_BASE_URL: str | None
     
-    # Spark Analysis Thresholds (Enterprise Configurable)
-    SPARK_HISTORY_SERVER_URL: str = "http://localhost:18080"
-    SPARK_SKEW_THRESHOLD_MULTIPLIER: float = 3.0
-    SPARK_MEMORY_OVERHEAD_WARNING_PERCENT: float = 0.85
+    # Agent Memory
+    AGENT_MEMORY_DB_PATH: str
+    
+    # Spark Analysis Thresholds
+    SPARK_HISTORY_SERVER_URL: str
+    SPARK_SKEW_THRESHOLD_MULTIPLIER: float
+    SPARK_MEMORY_OVERHEAD_WARNING_PERCENT: float
     
     # Airflow Rules
-    AIRFLOW_REQUIRE_TASKFLOW: bool = True
+    AIRFLOW_REQUIRE_TASKFLOW: bool
     
-    class Config:
-        env_file = ".env"
+    # Configuration Priority: ENV VARS > .env file > YAML file
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return init_settings, env_settings, dotenv_settings, YamlConfigSettingsSource(settings_cls)
 
 settings = Settings()
