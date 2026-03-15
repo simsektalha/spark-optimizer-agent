@@ -23,7 +23,7 @@ class SparkAppPayload(BaseModel):
     logs: Optional[str] = None
 
 class AnalysisResponse(BaseModel):
-    layer: str
-    bottlenecks: List[str]
-    optimized_solutions: List[str]
-    architectural_notes: List[str]
+    bottleneck_summary: str
+    current_situation: str
+    proposed_changes: List[str]
+    goal_expectation: str
